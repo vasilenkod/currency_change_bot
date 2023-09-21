@@ -1,20 +1,16 @@
 package com.vasilenkod.springdemobot.bot.commands.create;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectFirstFiatState implements CreateState{
+public class CreateSelectFirstFiatState implements CreateState{
 
     private CreateContext createContext;
 
-    public SelectFirstFiatState(CreateContext createContext) {
+    public CreateSelectFirstFiatState(CreateContext createContext) {
         this.createContext = createContext;
     }
 
@@ -32,8 +28,8 @@ public class SelectFirstFiatState implements CreateState{
         usdButton.setCallbackData("bot_create_give_usd");
 
         InlineKeyboardButton euroButton = new InlineKeyboardButton();
-        euroButton.setText("EURO");
-        euroButton.setCallbackData("bot_create_give_euro");
+        euroButton.setText("EUR");
+        euroButton.setCallbackData("bot_create_give_eur");
 
         InlineKeyboardButton cnyButton = new InlineKeyboardButton();
         cnyButton.setText("CNY");
@@ -55,7 +51,7 @@ public class SelectFirstFiatState implements CreateState{
     @Override
     public CreateState goNext() {
 
-        return new SelectSecondFiatState(createContext);
+        return new CreateSelectSecondFiatState(createContext);
     }
 
     @Override

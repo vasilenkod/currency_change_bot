@@ -41,13 +41,9 @@ public class Wallet {
 
     @Override
     public String toString() {
-        return "Wallet{" +
-                "id=" + id +
-                ", userTelegramId=" + user.getTelegramId() +
-                ", rubBalance='" + rubBalance + '\'' +
-                ", usdBalance='" + usdBalance + '\'' +
-                ", euroBalance='" + euroBalance + '\'' +
-                ", cnyBalance='" + cnyBalance + '\'' +
-                '}';
+        return "RUB: " + rubBalance + "\n" +
+                "USD: " + usdBalance + "\n" +
+                "EUR: " + euroBalance + "\n" +
+                "CNY: " + cnyBalance + "\n";
     }
 }

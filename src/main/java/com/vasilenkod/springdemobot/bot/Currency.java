@@ -1,10 +1,10 @@
 package com.vasilenkod.springdemobot.bot;
 
 public enum Currency {
-    RUB("rub"),
-    USD("usd"),
-    EUR("euro"),
-    CNY("cny");
+    RUB("RUB"),
+    USD("USD"),
+    EUR("EUR"),
+    CNY("CNY");
 
     private final String title;
 
@@ -24,7 +24,7 @@ public enum Currency {
             case "usd" -> {
                 return Currency.USD;
             }
-            case "euro" -> {
+            case "eur" -> {
                 return Currency.EUR;
             }
             case "cny" -> {

@@ -17,6 +17,8 @@ public class CreateContext {
 
     private CreateState state;
 
+    boolean isInputState = false;
+
     private Currency giveCurrency;
     private Currency getCurrency;
 

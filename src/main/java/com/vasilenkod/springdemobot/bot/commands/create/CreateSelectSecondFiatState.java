@@ -1,7 +1,5 @@
 package com.vasilenkod.springdemobot.bot.commands.create;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -9,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SelectSecondFiatState implements CreateState{
+public class CreateSelectSecondFiatState implements CreateState{
     private CreateContext createContext;
 
-    public SelectSecondFiatState(CreateContext createContext) {
+    public CreateSelectSecondFiatState(CreateContext createContext) {
         this.createContext = createContext;
     }
 
@@ -30,8 +28,8 @@ public class SelectSecondFiatState implements CreateState{
         usdButton.setCallbackData("bot_create_get_usd");
 
         InlineKeyboardButton euroButton = new InlineKeyboardButton();
-        euroButton.setText("EURO");
-        euroButton.setCallbackData("bot_create_get_euro");
+        euroButton.setText("EUR");
+        euroButton.setCallbackData("bot_create_get_eur");
 
         InlineKeyboardButton cnyButton = new InlineKeyboardButton();
         cnyButton.setText("CNY");
@@ -73,11 +71,11 @@ public class SelectSecondFiatState implements CreateState{
 
     @Override
     public CreateState goNext() {
-        return new ChooseFiatState(createContext);
+        return new CreateChooseFiatState(createContext);
     }
 
     @Override
     public CreateState goBack() {
-        return new SelectFirstFiatState(createContext);
+        return new CreateSelectFirstFiatState(createContext);
     }
 }

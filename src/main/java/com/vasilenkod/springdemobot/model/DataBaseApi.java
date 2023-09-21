@@ -10,6 +10,7 @@ public class DataBaseApi {
     @Autowired
     private WalletRepository walletRepository;
 
+
     public UserRepository users() {
         return userRepository;
     }
