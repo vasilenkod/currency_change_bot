@@ -63,7 +63,7 @@ public class WalletSelectCurrencyState implements WalletState{
 
     @Override
     public WalletState goNext(CallbackQuery callbackQuery) {
-        return null;
+        return new WalletChooseFiatState(walletContext);
     }
 
     @Override

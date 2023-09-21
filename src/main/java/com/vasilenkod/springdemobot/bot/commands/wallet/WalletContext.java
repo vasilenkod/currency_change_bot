@@ -1,11 +1,14 @@
 package com.vasilenkod.springdemobot.bot.commands.wallet;
 
+import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -15,6 +18,11 @@ public class WalletContext {
     private boolean isInputState = false;
     private DataBaseApi dataBaseApi;
     private String type;
+
+    private Currency currency;
+    private BigDecimal currencyAmount;
+
+    private int messageId;
 
     public WalletContext(DataBaseApi dataBaseApi) {
         this.dataBaseApi = dataBaseApi;

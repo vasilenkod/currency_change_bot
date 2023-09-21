@@ -1,28 +1,29 @@
-package com.vasilenkod.springdemobot.bot.commands.create;
+package com.vasilenkod.springdemobot.bot.commands.wallet;
 
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateInputState implements CreateState{
+public class WalletInputState implements WalletState{
 
-    private CreateContext createContext;
+    private WalletContext walletContext;
 
-    public CreateInputState(CreateContext createContext) {
-        this.createContext = createContext;
+    public WalletInputState(WalletContext walletContext) {
+        this.walletContext = walletContext;
     }
 
     @Override
     public InlineKeyboardMarkup getStateKeyboard() {
-
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
         InlineKeyboardButton backButton = new InlineKeyboardButton();
         backButton.setText("Назад");
-        backButton.setCallbackData("bot_create_input_back");
+        backButton.setCallbackData("bot_wallet_input_back");
 
         rows.add(List.of(backButton));
 
@@ -32,17 +33,17 @@ public class CreateInputState implements CreateState{
     }
 
     @Override
-    public String getStateMessage() {
+    public String getStateMessage(Message message)  {
         return "Введите количество валюты";
     }
 
     @Override
-    public CreateState goNext() {
-        return null;
+    public WalletState goNext(CallbackQuery callbackQuery) {
+        return new WalletFinalState(walletContext);
     }
 
     @Override
-    public CreateState goBack() {
-        return new CreateSelectSecondFiatState(createContext);
+    public WalletState goBack() {
+        return new WalletChooseFiatState(walletContext);
     }
 }
