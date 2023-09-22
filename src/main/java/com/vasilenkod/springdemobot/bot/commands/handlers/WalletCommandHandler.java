@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.handlers;
+package com.vasilenkod.springdemobot.bot.commands.handlers;
 
 
 import com.vasilenkod.springdemobot.bot.Currency;
@@ -40,7 +40,8 @@ public class WalletCommandHandler {
         String messageText = walletContext.getMessage(message);
         InlineKeyboardMarkup keyboardMarkup = walletContext.getKeyboard();
 
-        bot.sendMessage(chatId, messageText, keyboardMarkup);
+        Message newMessage = bot.sendMessage(chatId, messageText, keyboardMarkup);
+        walletContext.setMessageId(newMessage.getMessageId());
     }
 
 

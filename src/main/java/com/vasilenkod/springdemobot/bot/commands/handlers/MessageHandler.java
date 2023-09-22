@@ -1,7 +1,6 @@
-package com.vasilenkod.springdemobot.bot.handlers;
+package com.vasilenkod.springdemobot.bot.commands.handlers;
 
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;

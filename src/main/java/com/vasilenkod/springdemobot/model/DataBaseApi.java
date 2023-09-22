@@ -1,10 +1,7 @@
 package com.vasilenkod.springdemobot.model;
 
 import com.vasilenkod.springdemobot.bot.Currency;
-import com.vasilenkod.springdemobot.model.repository.DepositRepository;
-import com.vasilenkod.springdemobot.model.repository.UserRepository;
-import com.vasilenkod.springdemobot.model.repository.WalletRepository;
-import com.vasilenkod.springdemobot.model.repository.WithdrawRepository;
+import com.vasilenkod.springdemobot.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +20,9 @@ public class DataBaseApi {
     @Autowired
     private WithdrawRepository withdrawRepository;
 
+    @Autowired
+    ChangeRepository changeRepository;
+
 
     public UserRepository users() {
         return userRepository;
@@ -38,6 +38,10 @@ public class DataBaseApi {
 
     public WithdrawRepository withdraws() {
         return withdrawRepository;
+    }
+
+    public ChangeRepository changes() {
+        return changeRepository;
     }
 
     public BigDecimal getCurrencyAmount(long telegramId, Currency currency) {
@@ -65,6 +69,25 @@ public class DataBaseApi {
         };
         wallets().save(wallet);
 
+    }
+
+    public void removeFromWallet(long telegramId, Currency currency, BigDecimal value) {
+        User user = users().findById(telegramId).get();
+        Wallet wallet = user.getWallet();
+        BigDecimal storedAmount = wallet.getBalanceByCurrency(currency);
+        BigDecimal newAmount = storedAmount.subtract(value);
+        wallet.setBalanceByCurrency(currency, newAmount);
+        wallets().save(wallet);
+
+    }
+
+    public void addToWallet(long telegramId, Currency currency, BigDecimal value) {
+        User user = users().findById(telegramId).get();
+        Wallet wallet = user.getWallet();
+        BigDecimal storedAmount = wallet.getBalanceByCurrency(currency);
+        BigDecimal newAmount = storedAmount.add(value);
+        wallet.setBalanceByCurrency(currency, newAmount);
+        wallets().save(wallet);
     }
 
 

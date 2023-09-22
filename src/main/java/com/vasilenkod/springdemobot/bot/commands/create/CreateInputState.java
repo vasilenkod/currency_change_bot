@@ -38,7 +38,7 @@ public class CreateInputState implements CreateState{
 
     @Override
     public CreateState goNext() {
-        return null;
+        return new CreateFinalState(createContext);
     }
 
     @Override

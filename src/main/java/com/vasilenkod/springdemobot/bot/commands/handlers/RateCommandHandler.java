@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.handlers;
+package com.vasilenkod.springdemobot.bot.commands.handlers;
 
 import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.bot.TelegramBot;

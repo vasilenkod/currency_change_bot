@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,7 +27,10 @@ public class CreateContext {
     private Currency getCurrency;
 
     private BigDecimal giveCurrencyAmount;
-    private BigDecimal getGiveCurrencyAmount;
+    private BigDecimal getCurrencyAmount;
+
+    private int messageId;
+    private List<Integer> messagesToDelete = new ArrayList<>();
 
     public CreateContext(DataBaseApi dataBaseApi) {
         this.dataBaseApi = dataBaseApi;
