@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.commands.handlers;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 
 import com.vasilenkod.springdemobot.bot.Currency;
@@ -51,71 +51,20 @@ public class WalletCommandHandler {
 
         if (callbackQuery.getData().endsWith("back")) {
             newState = walletContext.goBack();
-        }
 
-        else if (callbackQuery.getData().endsWith("type")) {
-            newState = walletContext.goNext(callbackQuery);
-            walletContext.setInputState(true);
+        } else if (callbackQuery.getData().endsWith("type")) {
+            newState = handleInputState(callbackQuery);
+
         } else if (callbackQuery.getData().endsWith("all")) {
-            BigDecimal currencyAmount = walletContext.getDataBaseApi().
-                    getCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency());
-            walletContext.setCurrencyAmount(currencyAmount);
-            newState = walletContext.goNext(callbackQuery);
-        }
+            newState = handleAllState(callbackQuery);
 
-        else if (callbackQuery.getData().startsWith("bot_wallet_currency")) {
-            String[] splitCallback = callbackQuery.getData().split("_");
-            Currency currentGetCurrency = Currency.getCurrencyByString(splitCallback[splitCallback.length-1]);
-            walletContext.setCurrency(currentGetCurrency);
-            newState = walletContext.goNext(callbackQuery);
+        } else if (callbackQuery.getData().startsWith("bot_wallet_currency")) {
+            newState = handleSelectCurrencyState(callbackQuery);
 
         } else if (callbackQuery.getData().endsWith("fix")) {
+            handleWalletFinalState(callbackQuery);
+            return;
 
-            BigDecimal storedCurrencyAmount = dataBaseApi.getCurrencyAmount(callbackQuery.getMessage().getChatId(),
-                    walletContext.getCurrency());
-
-            if (walletContext.getType().equals("out")) {
-
-                BigDecimal sumCurrencyAmount = storedCurrencyAmount.subtract(walletContext.getCurrencyAmount());
-
-                dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
-                        sumCurrencyAmount);
-
-                Withdraw withdraw = new Withdraw();
-                withdraw.setUserId(callbackQuery.getMessage().getChatId());
-                withdraw.setCurrency(walletContext.getCurrency());
-                withdraw.setValue(walletContext.getCurrencyAmount());
-                dataBaseApi.withdraws().save(withdraw);
-
-                bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
-                bot.sendMessage(callbackQuery.getMessage().getChatId(),
-                        "-" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
-
-                walletContext = null;
-
-                return;
-
-            } else if (walletContext.getType().equals("add")) {
-
-                BigDecimal sumCurrencyAmount = storedCurrencyAmount.add(walletContext.getCurrencyAmount());
-
-                dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
-                        sumCurrencyAmount);
-
-                Deposit deposit = new Deposit();
-                deposit.setUserId(callbackQuery.getMessage().getChatId());
-                deposit.setCurrency(walletContext.getCurrency());
-                deposit.setValue(walletContext.getCurrencyAmount());
-                dataBaseApi.deposits().save(deposit);
-
-                bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
-                bot.sendMessage(callbackQuery.getMessage().getChatId(),
-                        "+" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
-
-                walletContext = null;
-
-                return;
-            }
         } else {
             newState = walletContext.goNext(callbackQuery);
         }
@@ -130,6 +79,73 @@ public class WalletCommandHandler {
         walletContext.setMessageId(messageId);
 
         bot.editMessage(chatId, messageId, messageText, keyboardMarkup);
+    }
+
+    private void handleWalletFinalState(CallbackQuery callbackQuery) {
+        BigDecimal storedCurrencyAmount = dataBaseApi.getCurrencyAmount(callbackQuery.getMessage().getChatId(),
+                walletContext.getCurrency());
+
+        if (walletContext.getType().equals("out")) {
+
+            BigDecimal sumCurrencyAmount = storedCurrencyAmount.subtract(walletContext.getCurrencyAmount());
+
+            dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
+                    sumCurrencyAmount);
+
+            Withdraw withdraw = new Withdraw();
+            withdraw.setUserId(callbackQuery.getMessage().getChatId());
+            withdraw.setCurrency(walletContext.getCurrency());
+            withdraw.setValue(walletContext.getCurrencyAmount());
+            dataBaseApi.withdraws().save(withdraw);
+
+            bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
+            bot.sendMessage(callbackQuery.getMessage().getChatId(),
+                    "-" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
+
+        } else if (walletContext.getType().equals("add")) {
+
+            BigDecimal sumCurrencyAmount = storedCurrencyAmount.add(walletContext.getCurrencyAmount());
+
+            dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
+                    sumCurrencyAmount);
+
+            Deposit deposit = new Deposit();
+            deposit.setUserId(callbackQuery.getMessage().getChatId());
+            deposit.setCurrency(walletContext.getCurrency());
+            deposit.setValue(walletContext.getCurrencyAmount());
+            dataBaseApi.deposits().save(deposit);
+
+            bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
+            bot.sendMessage(callbackQuery.getMessage().getChatId(),
+                    "+" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
+        }
+        walletContext = null;
+
+    }
+
+    private WalletState handleSelectCurrencyState(CallbackQuery callbackQuery) {
+        WalletState newState;
+        String[] splitCallback = callbackQuery.getData().split("_");
+        Currency currentGetCurrency = Currency.getCurrencyByString(splitCallback[splitCallback.length-1]);
+        walletContext.setCurrency(currentGetCurrency);
+        newState = walletContext.goNext(callbackQuery);
+        return newState;
+    }
+
+    private WalletState handleAllState(CallbackQuery callbackQuery) {
+        WalletState newState;
+        BigDecimal currencyAmount = walletContext.getDataBaseApi().
+                getCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency());
+        walletContext.setCurrencyAmount(currencyAmount);
+        newState = walletContext.goNext(callbackQuery);
+        return newState;
+    }
+
+    private WalletState handleInputState(CallbackQuery callbackQuery) {
+        WalletState newState;
+        newState = walletContext.goNext(callbackQuery);
+        walletContext.setInputState(true);
+        return newState;
     }
 
     void walletInputHandler(Message message) {
@@ -148,7 +164,7 @@ public class WalletCommandHandler {
             return;
         }
 
-        if (currentAmount.compareTo(BigDecimal.valueOf(0)) <= 0) {
+        if (currentAmount.compareTo(new BigDecimal("0.01")) < 0) {
             Message newMessage = bot.sendMessage(message.getChatId(), "Введите сумму больше 0");
             bot.deleteMessage(message.getChatId(), message.getMessageId());
             walletContext.getMessagesToDelete().add(newMessage.getMessageId());

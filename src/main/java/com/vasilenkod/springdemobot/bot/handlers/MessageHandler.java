@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.commands.handlers;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

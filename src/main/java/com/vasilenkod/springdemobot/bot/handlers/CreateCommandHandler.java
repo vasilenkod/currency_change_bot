@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.commands.handlers;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.bot.TelegramBot;
@@ -48,53 +48,19 @@ public class CreateCommandHandler {
         CreateState newState;
 
         if (callbackQuery.getData().endsWith("back")) {
-
             newState = createContext.goBack();
 
         } else if (callbackQuery.getData().startsWith("bot_create_give")) {
-
-            newState = createContext.goNext();
-            String[] splitCallback = callbackQuery.getData().split("_");
-            Currency currentGiveCurrency = Currency.getCurrencyByString(splitCallback[splitCallback.length-1]);
-            createContext.setGiveCurrency(currentGiveCurrency);
+            newState = handleSelectFirstFiatState(callbackQuery);
 
         } else if (callbackQuery.getData().startsWith("bot_create_get")) {
-
-            newState = createContext.goNext();
-            String[] splitCallback = callbackQuery.getData().split("_");
-            Currency currentGetCurrency = Currency.getCurrencyByString(splitCallback[splitCallback.length-1]);
-            createContext.setGetCurrency(currentGetCurrency);
-
+            newState = handleSelectSecondFiatState(callbackQuery);
 
         } else if (callbackQuery.getData().endsWith("type")) {
-            createContext.setInputState(true);
-            newState = createContext.goNext();
+            newState = handleInputState();
 
         } else if (callbackQuery.getData().endsWith("fix")) {
-            long telegramId = callbackQuery.getMessage().getChatId();
-
-            dataBaseApi.removeFromWallet(telegramId,
-                    createContext.getGiveCurrency(), createContext.getGiveCurrencyAmount());
-
-            dataBaseApi.addToWallet(telegramId,
-                    createContext.getGetCurrency(), createContext.getGetCurrencyAmount());
-
-            Change change = new Change();
-            change.setCurrencyFrom(createContext.getGiveCurrency());
-            change.setCurrencyTo(createContext.getGetCurrency());
-            change.setCurrencyFromValue(createContext.getGiveCurrencyAmount());
-            change.setCurrencyToValue(createContext.getGetCurrencyAmount());
-            dataBaseApi.changes().save(change);
-
-            bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());
-
-            bot.sendMessage(callbackQuery.getMessage().getChatId(),
-                    "-" + createContext.getGiveCurrencyAmount() + " " + createContext.getGiveCurrency().getTitle());
-
-            bot.sendMessage(callbackQuery.getMessage().getChatId(),
-                    "+" + createContext.getGetCurrencyAmount() + " " + createContext.getGetCurrency().getTitle());
-            createContext = null;
-
+            handleFinalState(callbackQuery);
             return;
 
         } else {
@@ -115,9 +81,58 @@ public class CreateCommandHandler {
 
     }
 
+    private void handleFinalState(CallbackQuery callbackQuery) {
+        long telegramId = callbackQuery.getMessage().getChatId();
+
+        dataBaseApi.removeFromWallet(telegramId,
+                createContext.getGiveCurrency(), createContext.getGiveCurrencyAmount());
+
+        dataBaseApi.addToWallet(telegramId,
+                createContext.getGetCurrency(), createContext.getGetCurrencyAmount());
+
+        Change change = new Change();
+        change.setCurrencyFrom(createContext.getGiveCurrency());
+        change.setCurrencyTo(createContext.getGetCurrency());
+        change.setCurrencyFromValue(createContext.getGiveCurrencyAmount());
+        change.setCurrencyToValue(createContext.getGetCurrencyAmount());
+        dataBaseApi.changes().save(change);
+
+        bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());
+
+        bot.sendMessage(callbackQuery.getMessage().getChatId(),
+                "-" + createContext.getGiveCurrencyAmount() + " " + createContext.getGiveCurrency().getTitle());
+
+        bot.sendMessage(callbackQuery.getMessage().getChatId(),
+                "+" + createContext.getGetCurrencyAmount() + " " + createContext.getGetCurrency().getTitle());
+        createContext = null;
+    }
+
+    private CreateState handleInputState() {
+        CreateState newState;
+        createContext.setInputState(true);
+        newState = createContext.goNext();
+        return newState;
+    }
+
+    private CreateState handleSelectSecondFiatState(CallbackQuery callbackQuery) {
+        CreateState newState;
+        newState = createContext.goNext();
+        String[] splitCallback = callbackQuery.getData().split("_");
+        Currency currentGetCurrency = Currency.getCurrencyByString(splitCallback[splitCallback.length-1]);
+        createContext.setGetCurrency(currentGetCurrency);
+        return newState;
+    }
+
+    private CreateState handleSelectFirstFiatState(CallbackQuery callbackQuery) {
+        CreateState newState;
+        newState = createContext.goNext();
+        String[] splitCallback = callbackQuery.getData().split("_");
+        Currency currentGiveCurrency = Currency.getCurrencyByString(splitCallback[splitCallback.length-1]);
+        createContext.setGiveCurrency(currentGiveCurrency);
+        return newState;
+    }
+
     void createInputHandler(Message message) {
-
-
         BigDecimal currentAmount;
 
         BigDecimal storedAmount = createContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),

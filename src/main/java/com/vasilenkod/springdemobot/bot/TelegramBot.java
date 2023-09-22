@@ -1,6 +1,6 @@
 package com.vasilenkod.springdemobot.bot;
 
-import com.vasilenkod.springdemobot.bot.commands.handlers.MessageHandler;
+import com.vasilenkod.springdemobot.bot.handlers.MessageHandler;
 import com.vasilenkod.springdemobot.config.BotConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

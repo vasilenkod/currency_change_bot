@@ -40,22 +40,6 @@ public class RatesApi {
         cnyToFiat.put(Currency.USD, new BigDecimal("7.30"));
         cnyToFiat.put(Currency.EUR, new BigDecimal("7.78"));
 
-//        rates.put(new Pair<>(Currency.RUB, Currency.USD), new BigDecimal("0.01"));
-//        rates.put(new Pair<>(Currency.RUB, Currency.EUR), new BigDecimal("0.0098"));
-//        rates.put(new Pair<>(Currency.RUB, Currency.CNY), new BigDecimal("0.076"));
-//
-//        rates.put(new Pair<>(Currency.USD, Currency.RUB), new BigDecimal("102.6"));
-//        rates.put(new Pair<>(Currency.USD, Currency.EUR), new BigDecimal("0.94"));
-//        rates.put(new Pair<>(Currency.USD, Currency.CNY ), new BigDecimal("7.30"));
-//
-//
-//        rates.put(new Pair<>(Currency.EUR, Currency.RUB), new BigDecimal("102.27"));
-//        rates.put(new Pair<>(Currency.EUR, Currency.USD), new BigDecimal("1.06"));
-//        rates.put(new Pair<>(Currency.EUR, Currency.CNY), new BigDecimal("7.78"));
-//
-//        rates.put(new Pair<>(Currency.CNY, Currency.RUB), new BigDecimal("13.30"));
-//        rates.put(new Pair<>(Currency.CNY, Currency.USD), new BigDecimal("0.14"));
-//        rates.put(new Pair<>(Currency.CNY, Currency.EUR), new BigDecimal("0.13"));
     }
 
     public BigDecimal getCurrencyToCurrencyRate(Currency c1, Currency c2) {

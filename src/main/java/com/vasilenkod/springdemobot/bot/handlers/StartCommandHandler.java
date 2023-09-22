@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.commands.handlers;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 import com.vasilenkod.springdemobot.bot.TelegramBot;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
