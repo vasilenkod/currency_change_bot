@@ -1,10 +1,8 @@
 package com.vasilenkod.springdemobot.bot.commands.rate;
 
 import com.vasilenkod.springdemobot.bot.Currency;
-import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;

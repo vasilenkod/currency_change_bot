@@ -1,7 +1,6 @@
 package com.vasilenkod.springdemobot.bot.commands.rate;
 
 import com.vasilenkod.springdemobot.bot.Currency;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -37,14 +36,14 @@ public class RateFinalState implements RateState{
 
     @Override
     public String getStateMessage(Message message) {
-        String messageText = "";
+        StringBuilder messageText = new StringBuilder();
         Currency currency = rateContext.getCurrentCurrency();
         var rates =  rateContext.getRatesApi().getRates();
         var ratesToCurrency = rates.get(currency);
         for (var entry: ratesToCurrency.entrySet()) {
-            messageText += entry.getKey().getTitle() + "->" + currency.getTitle() + " " + entry.getValue() + "\n";
+            messageText.append(entry.getKey().getTitle()).append("->").append(currency.getTitle()).append(" ").append(entry.getValue()).append("\n");
         }
-        return messageText;
+        return messageText.toString();
     }
 
     @Override

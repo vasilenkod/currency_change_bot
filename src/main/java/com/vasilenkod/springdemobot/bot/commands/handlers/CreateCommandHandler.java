@@ -6,12 +6,8 @@ import com.vasilenkod.springdemobot.bot.commands.create.CreateContext;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateFinalState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateSelectFirstFiatState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateState;
-import com.vasilenkod.springdemobot.bot.commands.wallet.WalletFinalState;
-import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import com.vasilenkod.springdemobot.model.Change;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
-import com.vasilenkod.springdemobot.model.User;
-import com.vasilenkod.springdemobot.model.Wallet;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -49,7 +45,7 @@ public class CreateCommandHandler {
 
     void callbackQueryCreateHandler(CallbackQuery callbackQuery) {
 
-        CreateState newState = null;
+        CreateState newState;
 
         if (callbackQuery.getData().endsWith("back")) {
 
@@ -122,7 +118,7 @@ public class CreateCommandHandler {
     void createInputHandler(Message message) {
 
 
-        BigDecimal currentAmount = BigDecimal.ZERO;
+        BigDecimal currentAmount;
 
         BigDecimal storedAmount = createContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
                 createContext.getGiveCurrency());
