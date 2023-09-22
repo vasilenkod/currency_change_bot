@@ -1,10 +1,7 @@
 package com.vasilenkod.springdemobot.model;
 
 import com.vasilenkod.springdemobot.bot.Currency;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +18,7 @@ public class Withdraw {
 
     private long userId;
 
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     private BigDecimal value;
