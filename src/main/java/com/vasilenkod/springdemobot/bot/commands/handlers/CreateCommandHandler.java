@@ -86,7 +86,7 @@ public class CreateCommandHandler {
             change.setCurrencyFrom(createContext.getGiveCurrency());
             change.setCurrencyTo(createContext.getGetCurrency());
             change.setCurrencyFromValue(createContext.getGiveCurrencyAmount());
-            change.setGetCurrencyToValue(createContext.getGetCurrencyAmount());
+            change.setCurrencyToValue(createContext.getGetCurrencyAmount());
             dataBaseApi.changes().save(change);
 
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());
@@ -97,6 +97,8 @@ public class CreateCommandHandler {
             bot.sendMessage(callbackQuery.getMessage().getChatId(),
                     "+" + createContext.getGetCurrencyAmount() + createContext.getGetCurrency().getTitle());
             createContext = null;
+
+            return;
 
         } else {
             newState = createContext.goNext();
@@ -134,7 +136,7 @@ public class CreateCommandHandler {
             return;
         }
 
-        if (currentAmount.compareTo(BigDecimal.ZERO) < 0) {
+        if (currentAmount.compareTo(new BigDecimal("0.01")) < 0) {
             Message newMessage = bot.sendMessage(message.getChatId(), "Введите сумму больше 0");
             bot.deleteMessage(message.getChatId(), message.getMessageId());
             createContext.getMessagesToDelete().add(newMessage.getMessageId());
