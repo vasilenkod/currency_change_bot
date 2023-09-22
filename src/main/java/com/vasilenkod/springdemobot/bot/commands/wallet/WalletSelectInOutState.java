@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class WalletSelectInOutState implements WalletState{
 
@@ -43,13 +44,13 @@ public class WalletSelectInOutState implements WalletState{
     @Override
     public String getStateMessage(Message message) {
         long id = message.getChatId();
-        var userOpt = walletContext.getDataBaseApi().users().findById(id);
+        Optional<User> userOpt = walletContext.getDataBaseApi().users().findById(id);
         if (userOpt.isEmpty()) {
             throw new RuntimeException("user not found");
         }
         User user = userOpt.get();
         Wallet wallet = user.getWallet();
-        return wallet.toString();
+        return "Ваш электронный кошелек:\n\n" + wallet.toString();
 
 
 

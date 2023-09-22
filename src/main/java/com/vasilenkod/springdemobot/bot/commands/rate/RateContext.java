@@ -1,7 +1,7 @@
-package com.vasilenkod.springdemobot.bot.commands.wallet;
+package com.vasilenkod.springdemobot.bot.commands.rate;
 
 import com.vasilenkod.springdemobot.bot.Currency;
-import com.vasilenkod.springdemobot.model.DataBaseApi;
+import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,28 +10,18 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Setter
 @Component
-public class WalletContext {
-    private DataBaseApi dataBaseApi;
+public class RateContext {
 
-    private WalletState state;
-    private boolean isInputState = false;
-    private String type;
+    private final RatesApi ratesApi;
+    private RateState state;
 
-    private Currency currency;
-    private BigDecimal currencyAmount;
+    private Currency currentCurrency;
 
-    private int messageId;
-    private List<Integer> messagesToDelete = new ArrayList<>();
-
-    public WalletContext(DataBaseApi dataBaseApi) {
-        this.dataBaseApi = dataBaseApi;
+    public RateContext(RatesApi ratesApi) {
+        this.ratesApi = ratesApi;
     }
 
     public InlineKeyboardMarkup getKeyboard() {
@@ -42,10 +32,12 @@ public class WalletContext {
         return state.getStateMessage(message);
     }
 
-    public WalletState goNext(CallbackQuery callbackQuery) {
+    public RateState goNext(CallbackQuery callbackQuery) {
         return state.goNext(callbackQuery);
     }
-    public WalletState goBack() {
+    public RateState goBack() {
         return state.goBack();
     }
+
+
 }

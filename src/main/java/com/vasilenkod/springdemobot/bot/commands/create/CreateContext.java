@@ -1,12 +1,10 @@
 package com.vasilenkod.springdemobot.bot.commands.create;
 
 import com.vasilenkod.springdemobot.bot.Currency;
-import lombok.Data;
+import com.vasilenkod.springdemobot.bot.commands.rate.RatesApi;
+import com.vasilenkod.springdemobot.model.DataBaseApi;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.math.BigDecimal;
@@ -14,6 +12,10 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class CreateContext {
+
+    private DataBaseApi dataBaseApi;
+
+    private RatesApi rates = new RatesApi();
 
     private CreateState state;
 
@@ -24,6 +26,10 @@ public class CreateContext {
 
     private BigDecimal giveCurrencyAmount;
     private BigDecimal getGiveCurrencyAmount;
+
+    public CreateContext(DataBaseApi dataBaseApi) {
+        this.dataBaseApi = dataBaseApi;
+    }
 
     public InlineKeyboardMarkup getKeyboard() {
         return state.getStateKeyboard();

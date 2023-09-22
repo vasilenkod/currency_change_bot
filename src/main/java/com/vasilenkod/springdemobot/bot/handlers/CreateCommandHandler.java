@@ -1,10 +1,11 @@
-package com.vasilenkod.springdemobot.bot.handler;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.bot.TelegramBot;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateContext;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateSelectFirstFiatState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateState;
+import com.vasilenkod.springdemobot.model.DataBaseApi;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,10 +23,15 @@ public class CreateCommandHandler {
     @Lazy
     TelegramBot bot;
 
+    @Autowired
+    DataBaseApi dataBaseApi;
+
     CreateContext createContext;
 
+
+
     void handleCreateCommand(Message message) {
-        createContext = new CreateContext();
+        createContext = new CreateContext(dataBaseApi);
         createContext.setState(new CreateSelectFirstFiatState(createContext));
         String messageText = createContext.getMessage();
         InlineKeyboardMarkup keyboardMarkup = createContext.getKeyboard();
@@ -74,13 +80,32 @@ public class CreateCommandHandler {
     }
 
     void createInputHandler(Message message) {
-        BigDecimal currentAmount;
+
+        createContext.setInputState(false);
+
+        BigDecimal currentAmount = BigDecimal.ZERO;
+
+        BigDecimal storedAmount = createContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
+                createContext.getGetCurrency());
+
         if (NumberUtils.isCreatable(message.getText())) {
             currentAmount = new BigDecimal(message.getText());
+
         } else {
             bot.sendMessage(message.getChatId(), "Вы ввели не число");
+            return;
         }
 
-        bot.sendMessage(message.getChatId(), message.getText());
+        if (currentAmount.compareTo(BigDecimal.ZERO) < 0) {
+            bot.sendMessage(message.getChatId(), "Введите сумму больше 0");
+            bot.deleteMessage(message.getChatId(), message.getMessageId());
+            return;
+        }
+
+        if (currentAmount.compareTo(storedAmount) > 0) {
+            bot.sendMessage(message.getChatId(), "У вас нет столько средств на счете. Введите корректную сумму.");
+            bot.deleteMessage(message.getChatId(), message.getMessageId());
+            return;
+        }
     }
 }

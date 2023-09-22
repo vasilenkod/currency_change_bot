@@ -1,6 +1,7 @@
-package com.vasilenkod.springdemobot.bot.handler;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -23,6 +24,9 @@ public class MessageHandler {
     private WalletCommandHandler walletCommandHandler;
 
     @Autowired
+    private RateCommandHandler rateCommandHandler;
+
+    @Autowired
     private HelpCommandHendler helpCommandHendler;
 
 
@@ -32,13 +36,15 @@ public class MessageHandler {
             Message message = update.getMessage();
             String messageText = message.getText();
 
+            //обработчик комманд бота
             switch (messageText) {
                 case "/start" -> startCommandHandler.handleStartCommand(message);
                 case "/create" -> createCommandHandler.handleCreateCommand(message);
                 case "/wallet" -> walletCommandHandler.handleWalletCommand(message);
+                case "/rate" -> rateCommandHandler.handleRateCommand(message);
                 case "/help" -> helpCommandHendler.handleHelpCommand(message);
                 
-                //если пришли числа то передаем в соответствующие обработчики
+                //обработчик пользовательского текста
                 default -> {
                     if (createCommandHandler.createContext != null &&
                             createCommandHandler.createContext.isInputState()) {
@@ -52,6 +58,8 @@ public class MessageHandler {
                     }
                 }
             }
+
+            //обработчик кнопок клавиатуры
         } else if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
             callbackQueryHandler(callbackQuery);
@@ -65,6 +73,8 @@ public class MessageHandler {
 
         } else if (callbackQuery.getData().startsWith("bot_wallet")) {
             walletCommandHandler.callbackQueryWalletHandler(callbackQuery);
+        } else if (callbackQuery.getData().startsWith("bot_rate")) {
+            rateCommandHandler.callbackQueryRateHandler(callbackQuery);
         }
     }
 

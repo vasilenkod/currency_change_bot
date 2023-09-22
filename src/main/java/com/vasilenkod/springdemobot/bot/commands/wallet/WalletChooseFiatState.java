@@ -52,7 +52,7 @@ public class WalletChooseFiatState implements WalletState{
         BigDecimal currencyAmount = walletContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
                 walletContext.getCurrency());
         String messageText = "Валюта: " + walletContext.getCurrency().getTitle() + "\n" +
-                             "Количество: " +  currencyAmount;
+                             "На счете: " +  currencyAmount;
         return messageText;
     }
 

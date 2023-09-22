@@ -1,6 +1,6 @@
 package com.vasilenkod.springdemobot.bot;
 
-import com.vasilenkod.springdemobot.bot.handler.MessageHandler;
+import com.vasilenkod.springdemobot.bot.handlers.MessageHandler;
 import com.vasilenkod.springdemobot.config.BotConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,6 +8,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.MessageAutoDeleteTimerChanged;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -39,27 +41,31 @@ public class TelegramBot extends TelegramLongPollingBot {
         messageHandler.handleMessage(update);
     }
 
-    public void sendMessage(long chatId, String textToSend) {
+    public Message sendMessage(long chatId, String textToSend) {
+        Message newMessage;
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
         try {
-            execute(message);
+            newMessage = execute(message);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+        return newMessage;
     }
 
-    public void sendMessage(long chatId, String textToSend, InlineKeyboardMarkup keyboardMarkup) {
+    public Message sendMessage(long chatId, String textToSend, InlineKeyboardMarkup keyboardMarkup) {
+        Message newMessage;
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
         message.setReplyMarkup(keyboardMarkup);
         try {
-            execute(message);
+            newMessage = execute(message);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+        return newMessage;
     }
 
     public void editMessage(long chatId, int messageId, String textToSend, InlineKeyboardMarkup keyboardMarkup) {

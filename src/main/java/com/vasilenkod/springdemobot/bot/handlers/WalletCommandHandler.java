@@ -1,4 +1,4 @@
-package com.vasilenkod.springdemobot.bot.handler;
+package com.vasilenkod.springdemobot.bot.handlers;
 
 
 import com.vasilenkod.springdemobot.bot.Currency;
@@ -33,13 +33,13 @@ public class WalletCommandHandler {
     WalletContext walletContext;
 
     void handleWalletCommand(Message message) {
-        var user = dataBaseApi.users().findById(message.getFrom().getId());
-        System.out.println(user.get());
         walletContext = new WalletContext(dataBaseApi);
         walletContext.setState(new WalletSelectInOutState(walletContext));
+
+        long chatId = message.getChatId();
         String messageText = walletContext.getMessage(message);
         InlineKeyboardMarkup keyboardMarkup = walletContext.getKeyboard();
-        long chatId = message.getChatId();
+
         bot.sendMessage(chatId, messageText, keyboardMarkup);
     }
 
@@ -69,34 +69,50 @@ public class WalletCommandHandler {
             newState = walletContext.goNext(callbackQuery);
 
         } else if (callbackQuery.getData().endsWith("fix")) {
+
+            BigDecimal storedCurrencyAmount = dataBaseApi.getCurrencyAmount(callbackQuery.getMessage().getChatId(),
+                    walletContext.getCurrency());
+
             if (walletContext.getType().equals("out")) {
-                BigDecimal storedCurrencyAmount = dataBaseApi.getCurrencyAmount(callbackQuery.getMessage().getChatId(),
-                        walletContext.getCurrency());
+
                 BigDecimal sumCurrencyAmount = storedCurrencyAmount.subtract(walletContext.getCurrencyAmount());
+
                 dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
                         sumCurrencyAmount);
+
                 Withdraw withdraw = new Withdraw();
                 withdraw.setUserId(callbackQuery.getMessage().getChatId());
                 withdraw.setCurrency(walletContext.getCurrency());
                 withdraw.setValue(walletContext.getCurrencyAmount());
                 dataBaseApi.withdraws().save(withdraw);
+
                 bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
+                bot.sendMessage(callbackQuery.getMessage().getChatId(),
+                        "-" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
+
                 walletContext = null;
+
                 return;
 
             } else if (walletContext.getType().equals("add")) {
-                BigDecimal storedCurrencyAmount = dataBaseApi.getCurrencyAmount(callbackQuery.getMessage().getChatId(),
-                        walletContext.getCurrency());
+
                 BigDecimal sumCurrencyAmount = storedCurrencyAmount.add(walletContext.getCurrencyAmount());
+
                 dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
                         sumCurrencyAmount);
+
                 Deposit deposit = new Deposit();
                 deposit.setUserId(callbackQuery.getMessage().getChatId());
                 deposit.setCurrency(walletContext.getCurrency());
                 deposit.setValue(walletContext.getCurrencyAmount());
                 dataBaseApi.deposits().save(deposit);
+
                 bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
+                bot.sendMessage(callbackQuery.getMessage().getChatId(),
+                        "+" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
+
                 walletContext = null;
+
                 return;
             }
         } else {
@@ -104,40 +120,51 @@ public class WalletCommandHandler {
         }
 
         walletContext.setState(newState);
+
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
         String messageText = walletContext.getMessage(callbackQuery.getMessage());
         InlineKeyboardMarkup keyboardMarkup = walletContext.getKeyboard();
+
         walletContext.setMessageId(messageId);
+
         bot.editMessage(chatId, messageId, messageText, keyboardMarkup);
     }
 
     void walletInputHandler(Message message) {
+
         BigDecimal currentAmount = BigDecimal.valueOf(0);
         BigDecimal storedAmount = walletContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
                 walletContext.getCurrency());
+
         if (NumberUtils.isCreatable(message.getText())) {
             currentAmount = new BigDecimal(message.getText());
 
         } else {
-            bot.sendMessage(message.getChatId(), "Вы ввели не число. Введите число");
+            Message newMessage = bot.sendMessage(message.getChatId(), "Вы ввели не число. Введите число");
             bot.deleteMessage(message.getChatId(), message.getMessageId());
+            walletContext.getMessagesToDelete().add(newMessage.getMessageId());
             return;
-
         }
 
-        if (walletContext.getType().equals("out") && currentAmount.compareTo(BigDecimal.valueOf(0)) <= 0) {
-            bot.sendMessage(message.getChatId(), "Введите сумму больше 0");
+        if (currentAmount.compareTo(BigDecimal.valueOf(0)) <= 0) {
+            Message newMessage = bot.sendMessage(message.getChatId(), "Введите сумму больше 0");
             bot.deleteMessage(message.getChatId(), message.getMessageId());
+            walletContext.getMessagesToDelete().add(newMessage.getMessageId());
             return;
         }
         if (walletContext.getType().equals("out") && currentAmount.compareTo(storedAmount) > 0) {
-            bot.sendMessage(message.getChatId(), "У вас нет столько средств на счете. Введите корректную сумму.");
+            Message newMessage = bot.sendMessage(message.getChatId(), "У вас нет столько средств на счете. Введите корректную сумму.");
             bot.deleteMessage(message.getChatId(), message.getMessageId());
+            walletContext.getMessagesToDelete().add(newMessage.getMessageId());
             return;
         }
 
-
+        if (!walletContext.getMessagesToDelete().isEmpty()) {
+            for(int messageId : walletContext.getMessagesToDelete()) {
+                bot.deleteMessage(message.getChatId(), messageId);
+            }
+        }
         bot.deleteMessage(message.getChatId(), message.getMessageId());
         walletContext.setCurrencyAmount(currentAmount);
         WalletState finalState = new WalletFinalState(walletContext);
