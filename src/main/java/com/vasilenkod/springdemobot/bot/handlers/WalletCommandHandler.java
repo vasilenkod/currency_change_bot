@@ -9,7 +9,6 @@ import com.vasilenkod.springdemobot.bot.commands.wallet.WalletSelectInOutState;
 import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import com.vasilenkod.springdemobot.model.Deposit;
-import com.vasilenkod.springdemobot.model.Withdraw;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -89,14 +88,17 @@ public class WalletCommandHandler {
 
             BigDecimal sumCurrencyAmount = storedCurrencyAmount.subtract(walletContext.getCurrencyAmount());
 
-            dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
-                    sumCurrencyAmount);
+            dataBaseApi.setCurrencyAmount(
+                    callbackQuery.getMessage().getChatId(),
+                    walletContext.getCurrency(),
+                    sumCurrencyAmount
+            );
 
-            Withdraw withdraw = new Withdraw();
-            withdraw.setUserId(callbackQuery.getMessage().getChatId());
-            withdraw.setCurrency(walletContext.getCurrency());
-            withdraw.setValue(walletContext.getCurrencyAmount());
-            dataBaseApi.withdraws().save(withdraw);
+            dataBaseApi.addWithdrawTransaction(
+                    callbackQuery.getMessage().getChatId(),
+                    walletContext.getCurrency(),
+                    walletContext.getCurrencyAmount()
+            );
 
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
             bot.sendMessage(callbackQuery.getMessage().getChatId(),
@@ -106,21 +108,25 @@ public class WalletCommandHandler {
 
             BigDecimal sumCurrencyAmount = storedCurrencyAmount.add(walletContext.getCurrencyAmount());
 
-            dataBaseApi.setCurrencyAmount(callbackQuery.getMessage().getChatId(), walletContext.getCurrency(),
-                    sumCurrencyAmount);
+            dataBaseApi.setCurrencyAmount(
+                    callbackQuery.getMessage().getChatId(),
+                    walletContext.getCurrency(),
+                    sumCurrencyAmount
+            );
 
-            Deposit deposit = new Deposit();
-            deposit.setUserId(callbackQuery.getMessage().getChatId());
-            deposit.setCurrency(walletContext.getCurrency());
-            deposit.setValue(walletContext.getCurrencyAmount());
-            dataBaseApi.deposits().save(deposit);
+            dataBaseApi.addDepositTransaction(
+                    callbackQuery.getMessage().getChatId(),
+                    walletContext.getCurrency(),
+                    walletContext.getCurrencyAmount()
+            );
+
 
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
             bot.sendMessage(callbackQuery.getMessage().getChatId(),
                     "+" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
         }
-        walletContext = null;
 
+        walletContext = null;
     }
 
     private WalletState handleSelectCurrencyState(CallbackQuery callbackQuery) {

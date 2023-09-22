@@ -77,8 +77,8 @@ public class DataBaseApi {
         BigDecimal storedAmount = wallet.getBalanceByCurrency(currency);
         BigDecimal newAmount = storedAmount.subtract(value);
         wallet.setBalanceByCurrency(currency, newAmount);
-        wallets().save(wallet);
 
+        wallets().save(wallet);
     }
 
     public void addToWallet(long telegramId, Currency currency, BigDecimal value) {
@@ -87,10 +87,53 @@ public class DataBaseApi {
         BigDecimal storedAmount = wallet.getBalanceByCurrency(currency);
         BigDecimal newAmount = storedAmount.add(value);
         wallet.setBalanceByCurrency(currency, newAmount);
+
         wallets().save(wallet);
     }
 
+    public void processTransaction(long telegramId, Currency currencyFrom, BigDecimal valueFrom,
+                                   Currency currencyTo, BigDecimal valueTo) {
 
+        User user = users().findById(telegramId).get();
+        Wallet wallet = user.getWallet();
 
+        BigDecimal storedAmount = wallet.getBalanceByCurrency(currencyFrom);
+        BigDecimal newAmount = storedAmount.subtract(valueFrom);
+        wallet.setBalanceByCurrency(currencyFrom, newAmount);
+
+        storedAmount = wallet.getBalanceByCurrency(currencyTo);
+        newAmount = storedAmount.add(valueTo);
+        wallet.setBalanceByCurrency(currencyTo, newAmount);
+
+        wallets().save(wallet);
+    }
+
+    public void addChangeTransaction(Currency currencyFrom, BigDecimal valueFrom,
+                                     Currency currencyTo, BigDecimal valueTo) {
+        Change change = new Change();
+        change.setCurrencyFrom(currencyFrom);
+        change.setCurrencyTo(currencyTo);
+        change.setCurrencyFromValue(valueFrom);
+        change.setCurrencyToValue(valueTo);
+
+        changes().save(change);
+    }
+
+    public void addDepositTransaction(long userId, Currency currency, BigDecimal value) {
+        Deposit deposit = new Deposit();
+        deposit.setUserId(userId);
+        deposit.setCurrency(currency);
+        deposit.setValue(value);
+
+        deposits().save(deposit);
+    }
+    public void addWithdrawTransaction(long userId, Currency currency, BigDecimal value) {
+        Withdraw withdraw = new Withdraw();
+        withdraw.setUserId(userId);
+        withdraw.setCurrency(currency);
+        withdraw.setValue(value);
+
+        withdraws().save(withdraw);
+    }
 
 }

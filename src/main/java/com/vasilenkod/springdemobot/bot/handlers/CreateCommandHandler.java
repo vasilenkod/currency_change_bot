@@ -6,7 +6,6 @@ import com.vasilenkod.springdemobot.bot.commands.create.CreateContext;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateFinalState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateSelectFirstFiatState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateState;
-import com.vasilenkod.springdemobot.model.Change;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,18 +83,20 @@ public class CreateCommandHandler {
     private void handleFinalState(CallbackQuery callbackQuery) {
         long telegramId = callbackQuery.getMessage().getChatId();
 
-        dataBaseApi.removeFromWallet(telegramId,
-                createContext.getGiveCurrency(), createContext.getGiveCurrencyAmount());
+        dataBaseApi.processTransaction(
+                telegramId,
+                createContext.getGiveCurrency(),
+                createContext.getGiveCurrencyAmount(),
+                createContext.getGetCurrency(),
+                createContext.getGetCurrencyAmount()
+        );
 
-        dataBaseApi.addToWallet(telegramId,
-                createContext.getGetCurrency(), createContext.getGetCurrencyAmount());
-
-        Change change = new Change();
-        change.setCurrencyFrom(createContext.getGiveCurrency());
-        change.setCurrencyTo(createContext.getGetCurrency());
-        change.setCurrencyFromValue(createContext.getGiveCurrencyAmount());
-        change.setCurrencyToValue(createContext.getGetCurrencyAmount());
-        dataBaseApi.changes().save(change);
+        dataBaseApi.addChangeTransaction(
+                createContext.getGiveCurrency(),
+                createContext.getGiveCurrencyAmount(),
+                createContext.getGetCurrency(),
+                createContext.getGetCurrencyAmount()
+        );
 
         bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());
 
@@ -104,6 +105,7 @@ public class CreateCommandHandler {
 
         bot.sendMessage(callbackQuery.getMessage().getChatId(),
                 "+" + createContext.getGetCurrencyAmount() + " " + createContext.getGetCurrency().getTitle());
+
         createContext = null;
     }
 
@@ -133,33 +135,10 @@ public class CreateCommandHandler {
     }
 
     void createInputHandler(Message message) {
-        BigDecimal currentAmount;
 
-        BigDecimal storedAmount = createContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
-                createContext.getGiveCurrency());
+        BigDecimal currentAmount = checkInput(message);
 
-        if (NumberUtils.isCreatable(message.getText())) {
-            currentAmount = new BigDecimal(message.getText());
-
-        } else {
-            Message newMessage = bot.sendMessage(message.getChatId(), "Вы ввели не число");
-            bot.deleteMessage(message.getChatId(), message.getMessageId());
-            createContext.getMessagesToDelete().add(newMessage.getMessageId());
-            return;
-        }
-
-        if (currentAmount.compareTo(new BigDecimal("0.01")) < 0) {
-            Message newMessage = bot.sendMessage(message.getChatId(), "Введите сумму больше 0");
-            bot.deleteMessage(message.getChatId(), message.getMessageId());
-            createContext.getMessagesToDelete().add(newMessage.getMessageId());
-            return;
-        }
-
-        if (currentAmount.compareTo(storedAmount) > 0) {
-            Message newMessage = bot.sendMessage(message.getChatId(),
-                    "У вас нет столько средств на счете. Введите корректную сумму.");
-            bot.deleteMessage(message.getChatId(), message.getMessageId());
-            createContext.getMessagesToDelete().add(newMessage.getMessageId());
+        if (currentAmount == null) {
             return;
         }
 
@@ -177,10 +156,7 @@ public class CreateCommandHandler {
                 divide(currencyRate, 2, RoundingMode.HALF_EVEN);
 
         if (newValue.compareTo(new BigDecimal("0.01")) < 0) {
-            Message newMessage = bot.sendMessage(message.getChatId(),
-                    "Количетсво получаемой валюты меньше 0.01. Введите большое количество меняемой валюты");
-            bot.deleteMessage(message.getChatId(), message.getMessageId());
-            createContext.getMessagesToDelete().add(newMessage.getMessageId());
+            NotifyUserAboutIncorrectInput(message, "Количетсво получаемой валюты меньше 0.01. Введите большое количество меняемой валюты");
             return;
         }
 
@@ -196,5 +172,35 @@ public class CreateCommandHandler {
         bot.editMessage(chatId, createContext.getMessageId(), messageText, keyboardMarkup);
 
         createContext.setInputState(false);
+    }
+
+    private BigDecimal checkInput(Message message) {
+        BigDecimal currentAmount;
+        BigDecimal storedAmount = createContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
+                createContext.getGiveCurrency());
+
+        if (NumberUtils.isCreatable(message.getText())) {
+            currentAmount = new BigDecimal(message.getText());
+
+        } else {
+            NotifyUserAboutIncorrectInput(message, "Вы ввели не число");
+            return null;
+        }
+
+        if (currentAmount.compareTo(new BigDecimal("0.01")) < 0) {
+            NotifyUserAboutIncorrectInput(message, "Введите сумму больше 0");
+            return null;
+        }
+        if (currentAmount.compareTo(storedAmount) > 0) {
+            NotifyUserAboutIncorrectInput(message, "У вас нет столько средств на счете. Введите корректную сумму.");
+            return null;
+        }
+        return currentAmount;
+    }
+
+    private void NotifyUserAboutIncorrectInput(Message message, String textToSend) {
+        Message newMessage = bot.sendMessage(message.getChatId(), textToSend);
+        bot.deleteMessage(message.getChatId(), message.getMessageId());
+        createContext.getMessagesToDelete().add(newMessage.getMessageId());
     }
 }
