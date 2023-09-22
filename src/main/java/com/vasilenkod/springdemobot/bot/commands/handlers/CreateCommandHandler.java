@@ -21,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Component
 public class CreateCommandHandler {
@@ -92,10 +93,10 @@ public class CreateCommandHandler {
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());
 
             bot.sendMessage(callbackQuery.getMessage().getChatId(),
-                    "-" + createContext.getGiveCurrencyAmount() + createContext.getGiveCurrency().getTitle());
+                    "-" + createContext.getGiveCurrencyAmount() + " " + createContext.getGiveCurrency().getTitle());
 
             bot.sendMessage(callbackQuery.getMessage().getChatId(),
-                    "+" + createContext.getGetCurrencyAmount() + createContext.getGetCurrency().getTitle());
+                    "+" + createContext.getGetCurrencyAmount() + " " + createContext.getGetCurrency().getTitle());
             createContext = null;
 
             return;
@@ -156,9 +157,25 @@ public class CreateCommandHandler {
                 bot.deleteMessage(message.getChatId(), messageId);
             }
         }
+        createContext.setGiveCurrencyAmount(currentAmount);
+
+        BigDecimal currencyRate = createContext.getRates().
+                getCurrencyToCurrencyRate(createContext.getGiveCurrency(), createContext.getGetCurrency());
+
+        BigDecimal newValue = createContext.getGiveCurrencyAmount().
+                divide(currencyRate, 2, RoundingMode.HALF_EVEN);
+
+        if (newValue.compareTo(new BigDecimal("0.01")) < 0) {
+            Message newMessage = bot.sendMessage(message.getChatId(),
+                    "Количетсво получаемой валюты меньше 0.01. Введите большое количество меняемой валюты");
+            bot.deleteMessage(message.getChatId(), message.getMessageId());
+            createContext.getMessagesToDelete().add(newMessage.getMessageId());
+            return;
+        }
+
+        createContext.setGetCurrencyAmount(newValue);
 
         bot.deleteMessage(message.getChatId(), message.getMessageId());
-        createContext.setGiveCurrencyAmount(currentAmount);
         CreateState finalState = new CreateFinalState(createContext);
         createContext.setState(finalState);
 

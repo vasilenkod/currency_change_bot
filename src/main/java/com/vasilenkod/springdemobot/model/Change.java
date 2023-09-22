@@ -26,5 +26,5 @@ public class Change {
     @Enumerated(EnumType.STRING)
     private Currency currencyTo;
 
-    private BigDecimal getCurrencyToValue;
+    private BigDecimal CurrencyToValue;
 }

@@ -39,15 +39,6 @@ public class CreateFinalState implements CreateState{
 
     @Override
     public String getStateMessage() {
-        BigDecimal currencyRate = createContext.getRates().
-                getCurrencyToCurrencyRate(createContext.getGiveCurrency(), createContext.getGetCurrency());
-
-        System.out.println(createContext.getGiveCurrencyAmount());
-
-        createContext.setGetCurrencyAmount(createContext.getGiveCurrencyAmount().
-                divide(currencyRate, 3, RoundingMode.HALF_EVEN));
-
-        System.out.println(createContext.getGiveCurrency().getTitle() + createContext.getGetCurrency().getTitle());
         String messageText = "";
         messageText += "Вы отдаете: " + createContext.getGiveCurrency().getTitle() + " " +
                 createContext.getGiveCurrencyAmount() + "\n";
