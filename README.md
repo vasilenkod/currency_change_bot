@@ -1,4 +1,4 @@
-# currency_change_bo
+# currency_change_bot
 
 Бот на Spring Boot для тестового обмена валют: RUB, USD, EUR, CNY.
 
