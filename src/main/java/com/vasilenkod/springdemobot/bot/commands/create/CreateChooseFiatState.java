@@ -37,7 +37,7 @@ public class CreateChooseFiatState implements CreateState{
     @Override
     public String getStateMessage() {
         return "Вы отдаете: " + createContext.getGiveCurrency().getTitle() + "\n" +
-                "Вы получате: " + createContext.getGetCurrency().getTitle();
+                "Вы получаете: " + createContext.getGetCurrency().getTitle();
     }
 
     @Override
