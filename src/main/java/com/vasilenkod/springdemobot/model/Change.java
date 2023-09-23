@@ -5,8 +5,10 @@ import com.vasilenkod.springdemobot.bot.Currency;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.glassfish.grizzly.http.util.TimeStamp;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 
 @Entity(name = "Change")
@@ -27,4 +29,6 @@ public class Change {
     private Currency currencyTo;
 
     private BigDecimal CurrencyToValue;
+
+    private Timestamp dateTime;
 }

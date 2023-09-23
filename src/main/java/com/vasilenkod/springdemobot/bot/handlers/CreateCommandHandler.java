@@ -8,8 +8,11 @@ import com.vasilenkod.springdemobot.bot.commands.create.CreateSelectFirstFiatSta
 import com.vasilenkod.springdemobot.bot.commands.create.CreateState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.checkerframework.checker.units.qual.Current;
+import org.glassfish.grizzly.http.util.TimeStamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -17,6 +20,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Component
 public class CreateCommandHandler {
@@ -82,6 +87,7 @@ public class CreateCommandHandler {
 
     private void handleFinalState(CallbackQuery callbackQuery) {
         long telegramId = callbackQuery.getMessage().getChatId();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         dataBaseApi.processTransaction(
                 telegramId,
@@ -95,7 +101,8 @@ public class CreateCommandHandler {
                 createContext.getGiveCurrency(),
                 createContext.getGiveCurrencyAmount(),
                 createContext.getGetCurrency(),
-                createContext.getGetCurrencyAmount()
+                createContext.getGetCurrencyAmount(),
+                timestamp
         );
 
         bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @Entity(name = "deposit")
 @Getter
@@ -22,4 +23,6 @@ public class Deposit {
     private Currency currency;
 
     private BigDecimal value;
+
+    private Timestamp dateTime;
 }

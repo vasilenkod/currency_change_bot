@@ -2,11 +2,13 @@ package com.vasilenkod.springdemobot.model;
 
 import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.model.repository.*;
+import org.glassfish.grizzly.http.util.TimeStamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @Component
 public class DataBaseApi {
@@ -116,31 +118,34 @@ public class DataBaseApi {
 
     @Transactional
     public void addChangeTransaction(Currency currencyFrom, BigDecimal valueFrom,
-                                     Currency currencyTo, BigDecimal valueTo) {
+                                     Currency currencyTo, BigDecimal valueTo, Timestamp date) {
         Change change = new Change();
         change.setCurrencyFrom(currencyFrom);
         change.setCurrencyTo(currencyTo);
         change.setCurrencyFromValue(valueFrom);
         change.setCurrencyToValue(valueTo);
+        change.setDateTime(date);
 
         changes().save(change);
     }
 
     @Transactional
-    public void addDepositTransaction(long userId, Currency currency, BigDecimal value) {
+    public void addDepositTransaction(long userId, Currency currency, BigDecimal value, Timestamp date) {
         Deposit deposit = new Deposit();
         deposit.setUserId(userId);
         deposit.setCurrency(currency);
         deposit.setValue(value);
+        deposit.setDateTime(date);
 
         deposits().save(deposit);
     }
     @Transactional
-    public void addWithdrawTransaction(long userId, Currency currency, BigDecimal value) {
+    public void addWithdrawTransaction(long userId, Currency currency, BigDecimal value, Timestamp date) {
         Withdraw withdraw = new Withdraw();
         withdraw.setUserId(userId);
         withdraw.setCurrency(currency);
         withdraw.setValue(value);
+        withdraw.setDateTime(date);
 
         withdraws().save(withdraw);
     }

@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @Component
 public class WalletCommandHandler {
@@ -82,6 +83,7 @@ public class WalletCommandHandler {
     private void handleWalletFinalState(CallbackQuery callbackQuery) {
         BigDecimal storedCurrencyAmount = dataBaseApi.getCurrencyAmount(callbackQuery.getMessage().getChatId(),
                 walletContext.getCurrency());
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         if (walletContext.getType().equals("out")) {
 
@@ -96,7 +98,8 @@ public class WalletCommandHandler {
             dataBaseApi.addWithdrawTransaction(
                     callbackQuery.getMessage().getChatId(),
                     walletContext.getCurrency(),
-                    walletContext.getCurrencyAmount()
+                    walletContext.getCurrencyAmount(),
+                    timestamp
             );
 
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
@@ -116,7 +119,8 @@ public class WalletCommandHandler {
             dataBaseApi.addDepositTransaction(
                     callbackQuery.getMessage().getChatId(),
                     walletContext.getCurrency(),
-                    walletContext.getCurrencyAmount()
+                    walletContext.getCurrencyAmount(),
+                    timestamp
             );
 
 

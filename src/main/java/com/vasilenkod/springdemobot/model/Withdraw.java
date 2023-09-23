@@ -4,8 +4,10 @@ import com.vasilenkod.springdemobot.bot.Currency;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.glassfish.grizzly.http.util.TimeStamp;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 
 @Entity(name = "withdraw")
@@ -22,4 +24,6 @@ public class Withdraw {
     private Currency currency;
 
     private BigDecimal value;
+
+    private Timestamp dateTime;
 }
