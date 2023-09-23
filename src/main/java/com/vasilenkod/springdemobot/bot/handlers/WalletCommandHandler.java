@@ -8,7 +8,6 @@ import com.vasilenkod.springdemobot.bot.commands.wallet.WalletFinalState;
 import com.vasilenkod.springdemobot.bot.commands.wallet.WalletSelectInOutState;
 import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
-import com.vasilenkod.springdemobot.model.Deposit;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -46,7 +45,7 @@ public class WalletCommandHandler {
 
     void callbackQueryWalletHandler(CallbackQuery callbackQuery) {
 
-        WalletState newState = null;
+        WalletState newState;
 
         if (callbackQuery.getData().endsWith("back")) {
             newState = walletContext.goBack();
@@ -156,7 +155,7 @@ public class WalletCommandHandler {
 
     void walletInputHandler(Message message) {
 
-        BigDecimal currentAmount = BigDecimal.valueOf(0);
+        BigDecimal currentAmount;
         BigDecimal storedAmount = walletContext.getDataBaseApi().getCurrencyAmount(message.getChatId(),
                 walletContext.getCurrency());
 

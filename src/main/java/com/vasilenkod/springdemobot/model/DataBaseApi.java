@@ -4,6 +4,7 @@ import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -44,6 +45,7 @@ public class DataBaseApi {
         return changeRepository;
     }
 
+    @Transactional
     public BigDecimal getCurrencyAmount(long telegramId, Currency currency) {
         User user = users().findById(telegramId).get();
         Wallet wallet = user.getWallet();
@@ -58,6 +60,7 @@ public class DataBaseApi {
 
     }
 
+    @Transactional
     public void setCurrencyAmount(long telegramId, Currency currency, BigDecimal newValue) {
         User user = users().findById(telegramId).get();
         Wallet wallet = user.getWallet();
@@ -66,11 +69,12 @@ public class DataBaseApi {
             case  USD -> wallet.setUsdBalance(newValue);
             case EUR -> wallet.setEuroBalance(newValue);
             case CNY -> wallet.setCnyBalance(newValue);
-        };
+        }
         wallets().save(wallet);
 
     }
 
+    @Transactional
     public void removeFromWallet(long telegramId, Currency currency, BigDecimal value) {
         User user = users().findById(telegramId).get();
         Wallet wallet = user.getWallet();
@@ -81,6 +85,7 @@ public class DataBaseApi {
         wallets().save(wallet);
     }
 
+    @Transactional
     public void addToWallet(long telegramId, Currency currency, BigDecimal value) {
         User user = users().findById(telegramId).get();
         Wallet wallet = user.getWallet();
@@ -91,6 +96,7 @@ public class DataBaseApi {
         wallets().save(wallet);
     }
 
+    @Transactional
     public void processTransaction(long telegramId, Currency currencyFrom, BigDecimal valueFrom,
                                    Currency currencyTo, BigDecimal valueTo) {
 
@@ -108,6 +114,7 @@ public class DataBaseApi {
         wallets().save(wallet);
     }
 
+    @Transactional
     public void addChangeTransaction(Currency currencyFrom, BigDecimal valueFrom,
                                      Currency currencyTo, BigDecimal valueTo) {
         Change change = new Change();
@@ -119,6 +126,7 @@ public class DataBaseApi {
         changes().save(change);
     }
 
+    @Transactional
     public void addDepositTransaction(long userId, Currency currency, BigDecimal value) {
         Deposit deposit = new Deposit();
         deposit.setUserId(userId);
@@ -127,6 +135,7 @@ public class DataBaseApi {
 
         deposits().save(deposit);
     }
+    @Transactional
     public void addWithdrawTransaction(long userId, Currency currency, BigDecimal value) {
         Withdraw withdraw = new Withdraw();
         withdraw.setUserId(userId);
