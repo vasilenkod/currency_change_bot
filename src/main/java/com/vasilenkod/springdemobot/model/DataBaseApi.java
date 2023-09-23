@@ -117,9 +117,10 @@ public class DataBaseApi {
     }
 
     @Transactional
-    public void addChangeTransaction(Currency currencyFrom, BigDecimal valueFrom,
+    public void addChangeTransaction(long userId, Currency currencyFrom, BigDecimal valueFrom,
                                      Currency currencyTo, BigDecimal valueTo, Timestamp date) {
         Change change = new Change();
+        change.setUserId(userId);
         change.setCurrencyFrom(currencyFrom);
         change.setCurrencyTo(currencyTo);
         change.setCurrencyFromValue(valueFrom);

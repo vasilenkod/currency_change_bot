@@ -20,6 +20,8 @@ public class Change {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long transactionId;
 
+    private long userId;
+
     @Enumerated(EnumType.STRING)
     private Currency currencyFrom;
 

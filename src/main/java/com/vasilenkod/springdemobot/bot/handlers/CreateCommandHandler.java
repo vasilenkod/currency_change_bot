@@ -98,6 +98,7 @@ public class CreateCommandHandler {
         );
 
         dataBaseApi.addChangeTransaction(
+                telegramId,
                 createContext.getGiveCurrency(),
                 createContext.getGiveCurrencyAmount(),
                 createContext.getGetCurrency(),
