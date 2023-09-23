@@ -43,6 +43,6 @@ public class CreateInputState implements CreateState{
 
     @Override
     public CreateState goBack() {
-        return new CreateSelectSecondFiatState(createContext);
+        return new CreateChooseFiatState(createContext);
     }
 }
