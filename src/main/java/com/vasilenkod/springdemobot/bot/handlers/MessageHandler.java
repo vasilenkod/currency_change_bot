@@ -28,6 +28,9 @@ public class MessageHandler {
     @Autowired
     private HelpCommandHendler helpCommandHendler;
 
+    @Autowired
+    Session session;
+
 
 
     public void handleMessage(Update update) {

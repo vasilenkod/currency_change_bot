@@ -10,6 +10,7 @@ import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -29,14 +30,27 @@ public class WalletCommandHandler {
     @Autowired
     DataBaseApi dataBaseApi;
 
+    @Autowired
+    Session session;
+
+    @Autowired
     WalletContext walletContext;
+
+    @Autowired
+    ApplicationContext applicationContext;
 
     void handleWalletCommand(Message message) {
         if (dataBaseApi.users().findById(message.getFrom().getId()).isEmpty()) {
             bot.sendMessage(message.getChatId(), "Наберите команду /start, чтобы зарегистрироваться");
             return;
         }
-        walletContext = new WalletContext(dataBaseApi);
+
+        deleteAnotherCommandsMessages(message);
+
+        walletContext = applicationContext.getBean(WalletContext.class);
+        session.setWalletContext(walletContext);
+
+
         walletContext.setState(new WalletSelectInOutState(walletContext));
 
         long chatId = message.getChatId();
@@ -45,6 +59,18 @@ public class WalletCommandHandler {
 
         Message newMessage = bot.sendMessage(chatId, messageText, keyboardMarkup);
         walletContext.setMessageId(newMessage.getMessageId());
+    }
+
+    private void deleteAnotherCommandsMessages(Message message) {
+        if (session.getCreateContext() != null) {
+            bot.deleteMessage(message.getChatId(), session.getCreateContext().getMessageId());
+            session.setCreateContext(null);
+        }
+
+        if (session.getWalletContext() != null) {
+            bot.deleteMessage(message.getChatId(), session.getWalletContext().getMessageId());
+            session.setWalletContext(null);
+        }
     }
 
 
@@ -134,6 +160,7 @@ public class WalletCommandHandler {
         }
 
         walletContext = null;
+        session.setWalletContext(null);
     }
 
     private WalletState handleSelectCurrencyState(CallbackQuery callbackQuery) {

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.checkerframework.checker.units.qual.Current;
 import org.glassfish.grizzly.http.util.TimeStamp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.stereotype.Component;
@@ -33,16 +34,34 @@ public class CreateCommandHandler {
     @Autowired
     DataBaseApi dataBaseApi;
 
+    @Autowired
+    Session session;
+
+    @Autowired
     CreateContext createContext;
 
-
+    @Autowired
+    ApplicationContext applicationContext;
 
     void handleCreateCommand(Message message) {
+
         if (dataBaseApi.users().findById(message.getFrom().getId()).isEmpty()) {
             bot.sendMessage(message.getChatId(), "Наберите команду /start, чтобы зарегистрироваться");
             return;
         }
-        createContext = new CreateContext(dataBaseApi);
+        if (session.getCreateContext() != null) {
+            bot.deleteMessage(message.getChatId(), session.getCreateContext().getMessageId());
+            session.setCreateContext(null);
+        }
+
+        if (session.getWalletContext() != null) {
+            bot.deleteMessage(message.getChatId(), session.getWalletContext().getMessageId());
+            session.setWalletContext(null);
+        }
+
+        createContext = applicationContext.getBean(CreateContext.class);
+        session.setCreateContext(createContext);
+
         createContext.setState(new CreateSelectFirstFiatState(createContext));
         String messageText = createContext.getMessage();
         InlineKeyboardMarkup keyboardMarkup = createContext.getKeyboard();
@@ -119,6 +138,7 @@ public class CreateCommandHandler {
                 "+" + createContext.getGetCurrencyAmount() + " " + createContext.getGetCurrency().getTitle());
 
         createContext = null;
+        session.setCreateContext(null);
     }
 
     private CreateState handleInputState() {

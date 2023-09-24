@@ -5,6 +5,8 @@ import com.vasilenkod.springdemobot.bot.commands.rate.RatesApi;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.math.BigDecimal;
@@ -13,6 +15,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@Component
+@Scope("prototype")
 public class CreateContext {
 
     private DataBaseApi dataBaseApi;

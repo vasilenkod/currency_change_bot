@@ -4,6 +4,9 @@ import com.vasilenkod.springdemobot.bot.Currency;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,6 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @Component
+@Scope("prototype")
 public class WalletContext {
     private DataBaseApi dataBaseApi;
 
