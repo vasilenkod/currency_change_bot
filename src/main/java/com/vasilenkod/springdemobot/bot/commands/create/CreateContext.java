@@ -35,6 +35,7 @@ public class CreateContext {
 
     private int messageId;
     private List<Integer> messagesToDelete = new ArrayList<>();
+    private long userId;
 
     public CreateContext(DataBaseApi dataBaseApi) {
         this.dataBaseApi = dataBaseApi;

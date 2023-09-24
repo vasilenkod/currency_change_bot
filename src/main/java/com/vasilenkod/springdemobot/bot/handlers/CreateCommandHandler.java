@@ -53,6 +53,7 @@ public class CreateCommandHandler {
         bot.deleteAnotherCommandsMessages(message, session);
 
         createContext = applicationContext.getBean(CreateContext.class);
+        createContext.setUserId(message.getFrom().getId());
         session.setCreateContext(createContext);
 
         createContext.setState(new CreateSelectFirstFiatState(createContext));

@@ -3,6 +3,7 @@ package com.vasilenkod.springdemobot.bot.commands.create;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +37,17 @@ public class CreateChooseFiatState implements CreateState{
 
     @Override
     public String getStateMessage() {
+
+        BigDecimal giveCurrencyAmount = createContext.getDataBaseApi().getCurrencyAmount(createContext.getUserId(),
+                createContext.getGiveCurrency());
+
+        BigDecimal getCurrencyAmount = createContext.getDataBaseApi().getCurrencyAmount(createContext.getUserId(),
+                createContext.getGetCurrency());
+
         return "Вы отдаете: " + createContext.getGiveCurrency().getTitle() + "\n" +
-                "Вы получаете: " + createContext.getGetCurrency().getTitle();
+                "На счете: " + giveCurrencyAmount + "\n\n" +
+                "Вы получаете: " + createContext.getGetCurrency().getTitle() + "\n" +
+                "На счете: " + getCurrencyAmount;
     }
 
     @Override
