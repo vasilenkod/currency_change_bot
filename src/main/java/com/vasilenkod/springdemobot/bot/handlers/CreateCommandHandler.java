@@ -38,6 +38,10 @@ public class CreateCommandHandler {
 
 
     void handleCreateCommand(Message message) {
+        if (dataBaseApi.users().findById(message.getFrom().getId()).isEmpty()) {
+            bot.sendMessage(message.getChatId(), "Наберите команду /start, чтобы зарегистрироваться");
+            return;
+        }
         createContext = new CreateContext(dataBaseApi);
         createContext.setState(new CreateSelectFirstFiatState(createContext));
         String messageText = createContext.getMessage();

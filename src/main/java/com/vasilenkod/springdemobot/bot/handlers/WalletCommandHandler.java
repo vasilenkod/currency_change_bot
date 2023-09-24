@@ -32,6 +32,10 @@ public class WalletCommandHandler {
     WalletContext walletContext;
 
     void handleWalletCommand(Message message) {
+        if (dataBaseApi.users().findById(message.getFrom().getId()).isEmpty()) {
+            bot.sendMessage(message.getChatId(), "Наберите команду /start, чтобы зарегистрироваться");
+            return;
+        }
         walletContext = new WalletContext(dataBaseApi);
         walletContext.setState(new WalletSelectInOutState(walletContext));
 
