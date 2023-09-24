@@ -45,7 +45,7 @@ public class WalletCommandHandler {
             return;
         }
 
-        deleteAnotherCommandsMessages(message);
+        bot.deleteAnotherCommandsMessages(message, session);
 
         walletContext = applicationContext.getBean(WalletContext.class);
         session.setWalletContext(walletContext);
@@ -60,19 +60,6 @@ public class WalletCommandHandler {
         Message newMessage = bot.sendMessage(chatId, messageText, keyboardMarkup);
         walletContext.setMessageId(newMessage.getMessageId());
     }
-
-    private void deleteAnotherCommandsMessages(Message message) {
-        if (session.getCreateContext() != null) {
-            bot.deleteMessage(message.getChatId(), session.getCreateContext().getMessageId());
-            session.setCreateContext(null);
-        }
-
-        if (session.getWalletContext() != null) {
-            bot.deleteMessage(message.getChatId(), session.getWalletContext().getMessageId());
-            session.setWalletContext(null);
-        }
-    }
-
 
     void callbackQueryWalletHandler(CallbackQuery callbackQuery) {
 

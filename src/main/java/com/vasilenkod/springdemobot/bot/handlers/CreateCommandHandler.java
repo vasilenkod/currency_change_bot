@@ -49,15 +49,8 @@ public class CreateCommandHandler {
             bot.sendMessage(message.getChatId(), "Наберите команду /start, чтобы зарегистрироваться");
             return;
         }
-        if (session.getCreateContext() != null) {
-            bot.deleteMessage(message.getChatId(), session.getCreateContext().getMessageId());
-            session.setCreateContext(null);
-        }
 
-        if (session.getWalletContext() != null) {
-            bot.deleteMessage(message.getChatId(), session.getWalletContext().getMessageId());
-            session.setWalletContext(null);
-        }
+        bot.deleteAnotherCommandsMessages(message, session);
 
         createContext = applicationContext.getBean(CreateContext.class);
         session.setCreateContext(createContext);

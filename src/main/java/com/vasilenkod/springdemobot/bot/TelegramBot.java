@@ -93,6 +93,27 @@ public class TelegramBot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
 
+    }
 
+    public void deleteAnotherCommandsMessages(Message message, Session session) {
+        if (session.getCreateContext() != null) {
+            deleteMessage(message.getChatId(), session.getCreateContext().getMessageId());
+            if (session.getCreateContext().getMessagesToDelete() != null) {
+                for (var messageToDelete : session.getCreateContext().getMessagesToDelete()) {
+                    deleteMessage(message.getChatId(), messageToDelete);
+                }
+            }
+            session.setCreateContext(null);
+        }
+
+        if (session.getWalletContext() != null) {
+            deleteMessage(message.getChatId(), session.getWalletContext().getMessageId());
+            if (session.getWalletContext().getMessagesToDelete() != null) {
+                for (var messageToDelete: session.getWalletContext().getMessagesToDelete()) {
+                    deleteMessage(message.getChatId(), messageToDelete);
+                }
+            }
+            session.setWalletContext(null);
+        }
     }
 }
