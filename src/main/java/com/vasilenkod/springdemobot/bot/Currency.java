@@ -1,5 +1,8 @@
 package com.vasilenkod.springdemobot.bot;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public enum Currency {
     RUB("RUB"),
     USD("USD"),
@@ -30,7 +33,10 @@ public enum Currency {
             case "cny" -> {
                 return Currency.CNY;
             }
-            default -> throw new IllegalArgumentException("currency not found");
+            default -> {
+                log.error("currency not found");
+                throw new IllegalArgumentException("currency not found");
+            }
         }
 
     }

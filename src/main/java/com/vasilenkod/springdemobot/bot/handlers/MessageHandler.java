@@ -1,13 +1,12 @@
 package com.vasilenkod.springdemobot.bot.handlers;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-
 
 
 @Component
@@ -40,8 +39,12 @@ public class MessageHandler {
 
             //обработчик комманд бота
             switch (messageText) {
-                case "/start" -> startCommandHandler.handleStartCommand(message);
-                case "/create" -> createCommandHandler.handleCreateCommand(message);
+                case "/start" -> {
+                    startCommandHandler.handleStartCommand(message);
+                }
+                case "/create" -> {
+                    createCommandHandler.handleCreateCommand(message);
+                }
                 case "/wallet" -> walletCommandHandler.handleWalletCommand(message);
                 case "/rate" -> rateCommandHandler.handleRateCommand(message);
                 case "/help" -> helpCommandHendler.handleHelpCommand(message);

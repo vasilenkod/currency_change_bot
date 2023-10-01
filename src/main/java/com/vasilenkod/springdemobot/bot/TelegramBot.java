@@ -4,6 +4,7 @@ import com.vasilenkod.springdemobot.bot.handlers.Contexts;
 import com.vasilenkod.springdemobot.bot.handlers.MessageHandler;
 import com.vasilenkod.springdemobot.bot.handlers.Session;
 import com.vasilenkod.springdemobot.config.BotConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -15,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
@@ -50,7 +52,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             newMessage = execute(message);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            log.error("Message can`t be send:" + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
         return newMessage;
     }
@@ -64,7 +67,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             newMessage = execute(message);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            log.error("Message with keyboard can`t be send:" + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
         return newMessage;
     }
@@ -79,7 +83,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            log.error("Message with keyboard can`t be edited:" + e.getMessage());
         }
 
     }
@@ -91,7 +95,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            log.error("Message can`t be deleted:" + e.getMessage());
         }
 
     }

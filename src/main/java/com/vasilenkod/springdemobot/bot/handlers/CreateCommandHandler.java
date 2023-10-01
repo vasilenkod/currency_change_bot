@@ -8,6 +8,7 @@ import com.vasilenkod.springdemobot.bot.commands.create.CreateSelectFirstFiatSta
 import com.vasilenkod.springdemobot.bot.commands.create.CreateState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
 import com.vasilenkod.springdemobot.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.checkerframework.checker.units.qual.Current;
 import org.glassfish.grizzly.http.util.TimeStamp;
@@ -25,6 +26,7 @@ import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 public class CreateCommandHandler {
 
@@ -96,6 +98,7 @@ public class CreateCommandHandler {
         }
 
         if (newState == null) {
+            log.error("current state is null");
             throw new RuntimeException("current state is null");
         }
 
@@ -129,6 +132,10 @@ public class CreateCommandHandler {
                 createContext.getGetCurrencyAmount(),
                 timestamp
         );
+
+        log.info("user " + callbackQuery.getMessage().getChatId() + " change " + createContext.getGiveCurrencyAmount() +
+                " " + createContext.getGiveCurrency() + " to " + createContext.getGetCurrencyAmount() + " " +
+                createContext.getGetCurrency());
 
         bot.deleteMessage(callbackQuery.getMessage().getChatId(), createContext.getMessageId());
 

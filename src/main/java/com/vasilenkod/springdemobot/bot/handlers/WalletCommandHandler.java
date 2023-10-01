@@ -8,6 +8,7 @@ import com.vasilenkod.springdemobot.bot.commands.wallet.WalletFinalState;
 import com.vasilenkod.springdemobot.bot.commands.wallet.WalletSelectInOutState;
 import com.vasilenkod.springdemobot.bot.commands.wallet.WalletState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+@Slf4j
 @Component
 public class WalletCommandHandler {
 
@@ -126,6 +128,9 @@ public class WalletCommandHandler {
                     timestamp
             );
 
+            log.info("user " + callbackQuery.getMessage().getChatId() + "withdraw " +
+                            walletContext.getCurrencyAmount() + " " + walletContext.getCurrency());
+
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
             bot.sendMessage(callbackQuery.getMessage().getChatId(),
                     "-" + walletContext.getCurrencyAmount() + " " + walletContext.getCurrency().getTitle());
@@ -146,6 +151,9 @@ public class WalletCommandHandler {
                     walletContext.getCurrencyAmount(),
                     timestamp
             );
+
+            log.info("user " + callbackQuery.getMessage().getChatId() + "deposit " +
+                    walletContext.getCurrencyAmount() + " " + walletContext.getCurrency());
 
 
             bot.deleteMessage(callbackQuery.getMessage().getChatId(), walletContext.getMessageId());
