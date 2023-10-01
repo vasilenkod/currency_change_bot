@@ -1,5 +1,6 @@
 package com.vasilenkod.springdemobot.bot;
 
+import com.vasilenkod.springdemobot.bot.handlers.Contexts;
 import com.vasilenkod.springdemobot.bot.handlers.MessageHandler;
 import com.vasilenkod.springdemobot.bot.handlers.Session;
 import com.vasilenkod.springdemobot.config.BotConfig;
@@ -95,25 +96,32 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-    public void deleteAnotherCommandsMessages(Message message, Session session) {
-        if (session.getCreateContext() != null) {
-            deleteMessage(message.getChatId(), session.getCreateContext().getMessageId());
-            if (session.getCreateContext().getMessagesToDelete() != null) {
-                for (var messageToDelete : session.getCreateContext().getMessagesToDelete()) {
-                    deleteMessage(message.getChatId(), messageToDelete);
-                }
-            }
-            session.setCreateContext(null);
+    public void deleteRepeatedCommands(Message message, Session session, long telegramId) {
+
+        if (!session.getSessions().containsKey(telegramId)) {
+            return;
         }
 
-        if (session.getWalletContext() != null) {
-            deleteMessage(message.getChatId(), session.getWalletContext().getMessageId());
-            if (session.getWalletContext().getMessagesToDelete() != null) {
-                for (var messageToDelete: session.getWalletContext().getMessagesToDelete()) {
+        Contexts contexts = session.getSessions().get(telegramId);
+        if (contexts.getCreateContext() != null) {
+            deleteMessage(message.getChatId(), contexts.getCreateContext().getMessageId());
+            if (contexts.getCreateContext().getMessagesToDelete() != null) {
+                for (var messageToDelete : contexts.getCreateContext().getMessagesToDelete()) {
                     deleteMessage(message.getChatId(), messageToDelete);
                 }
             }
-            session.setWalletContext(null);
         }
+        session.getSessions().get(telegramId).setCreateContext(null);
+
+        if (contexts.getWalletContext() != null) {
+            deleteMessage(message.getChatId(), contexts.getWalletContext().getMessageId());
+            if (contexts.getWalletContext().getMessagesToDelete() != null) {
+                for (var messageToDelete : contexts.getWalletContext().getMessagesToDelete()) {
+                    deleteMessage(message.getChatId(), messageToDelete);
+                }
+            }
+        }
+        session.getSessions().get(telegramId).setWalletContext(null);
     }
+
 }

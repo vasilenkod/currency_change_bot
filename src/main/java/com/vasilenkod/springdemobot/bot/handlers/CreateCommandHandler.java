@@ -7,6 +7,7 @@ import com.vasilenkod.springdemobot.bot.commands.create.CreateFinalState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateSelectFirstFiatState;
 import com.vasilenkod.springdemobot.bot.commands.create.CreateState;
 import com.vasilenkod.springdemobot.model.DataBaseApi;
+import com.vasilenkod.springdemobot.model.User;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.checkerframework.checker.units.qual.Current;
 import org.glassfish.grizzly.http.util.TimeStamp;
@@ -50,11 +51,17 @@ public class CreateCommandHandler {
             return;
         }
 
-        bot.deleteAnotherCommandsMessages(message, session);
+        long telegramId = message.getFrom().getId();
+
+        bot.deleteRepeatedCommands(message, session, telegramId);
+
+        if (!session.getSessions().containsKey(telegramId)) {
+            session.getSessions().put(telegramId, new Contexts());
+        }
 
         createContext = applicationContext.getBean(CreateContext.class);
         createContext.setUserId(message.getFrom().getId());
-        session.setCreateContext(createContext);
+        session.sessions.get(telegramId).setCreateContext(createContext);
 
         createContext.setState(new CreateSelectFirstFiatState(createContext));
         String messageText = createContext.getMessage();
@@ -132,7 +139,7 @@ public class CreateCommandHandler {
                 "+" + createContext.getGetCurrencyAmount() + " " + createContext.getGetCurrency().getTitle());
 
         createContext = null;
-        session.setCreateContext(null);
+        session.sessions.get(telegramId).setCreateContext(null);
     }
 
     private CreateState handleInputState() {

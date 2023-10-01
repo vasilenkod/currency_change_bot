@@ -45,10 +45,17 @@ public class WalletCommandHandler {
             return;
         }
 
-        bot.deleteAnotherCommandsMessages(message, session);
+        long telegramId = message.getFrom().getId();
+
+        bot.deleteRepeatedCommands(message, session, telegramId);
+
+        if (!session.getSessions().containsKey(telegramId)) {
+            session.getSessions().put(telegramId, new Contexts());
+        }
+
 
         walletContext = applicationContext.getBean(WalletContext.class);
-        session.setWalletContext(walletContext);
+        session.sessions.get(telegramId).setWalletContext(walletContext);
 
 
         walletContext.setState(new WalletSelectInOutState(walletContext));
@@ -147,7 +154,8 @@ public class WalletCommandHandler {
         }
 
         walletContext = null;
-        session.setWalletContext(null);
+        long telegramId = callbackQuery.getMessage().getChatId();
+        session.sessions.get(telegramId).setWalletContext(null);
     }
 
     private WalletState handleSelectCurrencyState(CallbackQuery callbackQuery) {
