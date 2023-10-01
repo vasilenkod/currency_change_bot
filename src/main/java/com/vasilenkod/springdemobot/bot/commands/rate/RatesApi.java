@@ -30,7 +30,7 @@ public class RatesApi {
 
         Map<Currency, BigDecimal> eurToFiat = new HashMap<>();
         rates.put(Currency.EUR, eurToFiat);
-        eurToFiat.put(Currency.RUB, new BigDecimal("0.098"));
+        eurToFiat.put(Currency.RUB, new BigDecimal("0.0098"));
         eurToFiat.put(Currency.USD, new BigDecimal("1.06"));
         eurToFiat.put(Currency.CNY, new BigDecimal("0.13"));
 
